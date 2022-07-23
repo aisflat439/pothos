@@ -39,7 +39,9 @@ export interface PrismaModelTypes {
   Shape: {};
   Include: unknown;
   Select: unknown;
+  OrderBy: unknown;
   Where: {};
+  WhereUnique: {};
   Fields: string;
   ListRelations: string;
   RelationName: string;
@@ -175,12 +177,12 @@ export type PrismaObjectTypeOptions<
         include?: Include & Model['Include'];
         select?: never;
         findUnique?: FindUnique &
-          (((parent: Shape, context: Types['Context']) => Model['Where']) | null);
+          (((parent: Shape, context: Types['Context']) => Model['WhereUnique']) | null);
       }
     | {
         select: Model['Select'] & Select;
         include?: never;
-        findUnique?: (parent: Shape, context: Types['Context']) => Model['Where'];
+        findUnique?: (parent: Shape, context: Types['Context']) => Model['WhereUnique'];
       }
   );
 
@@ -231,7 +233,9 @@ export type PrismaNodeOptions<
           }
         | {
             resolve?: never;
-            field: UniqueField extends keyof Model['Where'] ? UniqueField : keyof Model['Where'];
+            field: UniqueField extends keyof Model['WhereUnique']
+              ? UniqueField
+              : keyof Model['WhereUnique'];
           }
       );
     fields?: PrismaObjectFieldsShape<
@@ -243,10 +247,10 @@ export type PrismaNodeOptions<
     >;
   } & (UniqueField extends string
     ? {
-        findUnique?: (id: string, context: Types['Context']) => Model['Where'];
+        findUnique?: (id: string, context: Types['Context']) => Model['WhereUnique'];
       }
     : {
-        findUnique: (id: string, context: Types['Context']) => Model['Where'];
+        findUnique: (id: string, context: Types['Context']) => Model['WhereUnique'];
       }) &
   (
     | {
@@ -484,7 +488,7 @@ export type PrismaConnectionFieldOptions<
     'args' | 'resolve' | 'type'
   > & {
     type: Type;
-    cursor: string & keyof Model['Where'];
+    cursor: string & keyof Model['WhereUnique'];
     defaultSize?: number;
     maxSize?: number;
     resolve: (
